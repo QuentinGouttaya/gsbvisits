@@ -1,0 +1,32 @@
+version: '3'
+services:
+  php:
+    build: .
+    volumes:
+      - .:/var/www/html
+    networks:
+      - mynetwork
+  nginx:
+    image: nginx:latest
+    ports:
+      - "8080:80"
+    volumes:
+      - .:/var/www/html
+      - ./nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - mynetwork
+  mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mydb
+    volumes:
+      - mydb:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: ["--init-file", "/docker-entrypoint-initdb.d/init.sql"]
+    networks:
+      - mynetwork
+networks:
+  mynetwork:
+volumes:
+  mydb:
