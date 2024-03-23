@@ -11,13 +11,13 @@ class Doctor
     private $province;
 
     public function __construct(
-        int $id,
+        int $id = null,
         string $name,
         string $surname,
-        string $address = null,
-        string $phone = null,
-        string $additionalSpeciality = null,
-        string $province = null
+        string $address,
+        string $phone,
+        string $additionalSpeciality,
+        string $province
     ) {
         $this->id = $id;
         $this->name = $name;
@@ -58,43 +58,48 @@ class Doctor
         $this->surname = $surname;
     }
 
-    public function getAddress(): ?string
+    public function getAddress(): string
     {
         return $this->address;
     }
 
-    public function setAddress(?string $address): void
+    public function setAddress(string $address): void
     {
         $this->address = $address;
     }
 
-    public function getPhone(): ?string
+    public function getPhone(): string
     {
         return $this->phone;
     }
 
-    public function setPhone(?string $phone): void
+    public function setPhone(string $phone): void
     {
         $this->phone = $phone;
     }
 
-    public function getAdditionalSpeciality(): ?string
+    public function getAdditionalSpeciality(): string
     {
         return $this->additionalSpeciality;
     }
 
-    public function setAdditionalSpeciality(?string $additionalSpeciality): void
+    public function setAdditionalSpeciality(string $additionalSpeciality): void
     {
         $this->additionalSpeciality = $additionalSpeciality;
     }
 
-    public function getProvince(): ?string
+    public function getProvince(): string
     {
         return $this->province;
     }
 
-    public function setProvince(?string $province): void
+    public function setProvince(string $province): void
     {
         $this->province = $province;
+    }
+
+    public function getFullName(): string
+    {
+        return $this->name . ' ' . $this->surname;
     }
 }
