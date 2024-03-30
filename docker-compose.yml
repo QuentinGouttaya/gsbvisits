@@ -1,0 +1,30 @@
+services:
+  php:
+    build: .
+    volumes:
+      - .:/var/www/html
+    ports:
+      - "4400:4400"
+    environment:
+      - DB_HOST=mysql
+      - DB_NAME=mydb
+      - DB_USER=root
+      - DB_PASS=root
+    command: php -S 0.0.0.0:4400
+    networks:
+      - mynetwork
+  mysql:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: mydb
+    volumes:
+      - mydb:/var/lib/mysql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: ["--init-file", "/docker-entrypoint-initdb.d/init.sql"]
+    networks:
+      - mynetwork
+networks:
+  mynetwork:
+volumes:
+  mydb:
