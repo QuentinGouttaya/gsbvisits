@@ -11,15 +11,17 @@ class Doctor
     private $phone;
     private $additionalSpeciality;
     private $province;
+    private $mail;
 
     public function __construct(
-        int $id,
+        int $id = null,
         string $name,
         string $surname,
         string $address,
         string $phone,
         string $additionalSpeciality,
-        string $province
+        string $province,
+        string $mail
     ) {
         $this->id = $id;
         $this->name = $name;
@@ -28,6 +30,7 @@ class Doctor
         $this->phone = $phone;
         $this->additionalSpeciality = $additionalSpeciality;
         $this->province = $province;
+        $this->mail = $mail;
     }
 
     public function getId(): int
@@ -100,6 +103,16 @@ class Doctor
         $this->province = $province;
     }
 
+    public function getMail(): string
+    {
+        return $this->mail;
+    }
+
+    public function setMail(string $mail): void
+    {
+        $this->mail = $mail;
+    }
+
     public function getFullName(): string
     {
         return $this->name . ' ' . $this->surname;
@@ -110,7 +123,7 @@ class Doctor
         $stmt = $pdo->prepare("SELECT * FROM Doctor WHERE id = :id");
         $stmt->execute(['id' => $id]);
         $row = $stmt->fetch();
-        return new Doctor($row['id'], $row['name'], $row['surname'], $row['address'], $row['phone'], $row['additionalSpeciality'], $row['province']);
+        return new Doctor($row['id'], $row['name'], $row['surname'], $row['address'], $row['phone'], $row['additionalSpeciality'], $row['province'], $row['mail']);
     }
 
     public static function getAll(){
@@ -119,9 +132,40 @@ class Doctor
         $rows = $stmt->fetchAll();
         $doctors = [];
         foreach($rows as $row){
-            $doctor = new Doctor($row['id'], $row['name'], $row['surname'], $row['address'], $row['phone'], $row['additionalSpeciality'], $row['province']);
+            $doctor = new Doctor($row['id'], $row['name'], $row['surname'], $row['address'], $row['phone'], $row['additionalSpeciality'], $row['province'], $row['mail']);
             $doctors[] = $doctor;
         }
         return $doctors;
+    }
+
+    public static function getDoctorByName(string $name){
+        $pdo = dbConnect();
+        $stmt = $pdo->prepare("SELECT * FROM Doctor WHERE name LIKE :name");
+        $nameParameter = '%' . $name . '%';
+        $stmt->execute(['name' => $nameParameter]);
+        $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $doctors = [];
+        foreach($results as $result){
+            $doctor = new Doctor($result['id'], $result['name'], $result['surname'], $result['address'], $result['phone'], $result['additionalSpeciality'], $result['province'], $result['mail']);
+            $doctors[] = $doctor;
+        }
+        return $doctors;
+    }
+
+    public function save() {
+        $pdo = dbConnect();
+        $stmt = $pdo->prepare("INSERT INTO Doctor (name, surname, address, phone, additionalSpeciality, province, mail) VALUES (:name, :surname, :address, :phone, :additionalSpeciality, :province, :mail)");
+        $stmt->execute([
+            'name' => $this->name,
+            'surname' => $this->surname,
+            'address' => $this->address,
+            'phone' => $this->phone,
+            'additionalSpeciality' => $this->additionalSpeciality,
+            'province' => $this->province,
+            'mail' => $this->mail
+        ]);
+        $this->id = $pdo->lastInsertId();
+        $doctor = Doctor::getByID($this->id);
+        return $doctor;
     }
 }

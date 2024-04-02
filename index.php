@@ -31,6 +31,10 @@ if ($controllerName === 'Reports') {
     $controllerName = 'Report';
 }
 
+if ($controllerName === 'Doctors') {
+    $controllerName = 'Doctor';
+}
+
 if ($controllerName === 'Medicaments') {
     $controllerName = 'Medicament';
 }
@@ -53,6 +57,7 @@ if (!isset($_SESSION['visitor']) && $controllerName !== 'Auth') {
 if (!method_exists($controllerInstance, $actionName)) {
     header('HTTP/1.0 404 Not Found');
     echo "Action {$actionName} not found in {$controllerName}";
+    echo '<br><br><a href="/">Home</a>';
     exit;
 }
 
@@ -133,10 +138,47 @@ switch ($controllerName) {
                 }
                 break;
             }
+            break;
+    case 'Doctor':
+        $visitor = isset($_SESSION['visitor']) ? $_SESSION['visitor'] : null;
+        if (method_exists($controllerInstance, $actionName)) {
+            $controllerInstance->{$actionName}($visitor);
+        } else {
+            echo "Action {$actionName} not found in {$controllerName}";
+        }
+        break;
+        switch ($actionName) {
+            case 'search':
+                $visitor = isset($_SESSION['visitor']) ? $_SESSION['visitor'] : null;
+                if (method_exists($controllerInstance, $actionName)) {
+                    $controllerInstance->{$actionName}($visitor);
+                } else {
+                    echo "Action {$actionName} not found in {$controllerName}";
+                }
+                break;
+            case 'profile':
+                $visitor = isset($_SESSION['visitor']) ? $_SESSION['visitor'] : null;
+                if (method_exists($controllerInstance, $actionName)) {
+                    $controllerInstance->{$actionName}($visitor);
+                } else {
+                    echo "Action {$actionName} not found in {$controllerName}";
+                }
+                break;
+            }
+            case 'create':
+                $visitor = isset($_SESSION['visitor']) ? $_SESSION['visitor'] : null;
+                if (method_exists($controllerInstance, $actionName)) {
+                    $controllerInstance->{$actionName}($visitor);
+                } else {
+                    echo "Action {$actionName} not found in {$controllerName}";
+                }
+            break;
+        
     default:
         if (method_exists($controllerInstance, $actionName)) {
             $controllerInstance->{$actionName}($url);
         } else {
+            echo '<a href="/">Home</a>';
             echo "Action {$actionName} not found in {$controllerName}";
         }
 }

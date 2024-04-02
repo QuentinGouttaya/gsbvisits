@@ -8,6 +8,8 @@
 </head>
 
 <body>
+
+<a href="/">Home</a>
     <h1>Add Medicament</h1>
     <form action="/medicaments/add" method="post">
         <label for="name">Nom du medicament:</label>
