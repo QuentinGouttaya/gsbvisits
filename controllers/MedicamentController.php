@@ -12,4 +12,9 @@ class MedicamentController
         $medicaments = Medicament::getMedicaments();
         require_once __DIR__ . '/../views/medicaments.php';
     }
+
+    public function create()
+    {
+        require_once __DIR__ . '/../views/medicament-create.php';
+    }
 }

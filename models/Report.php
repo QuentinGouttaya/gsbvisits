@@ -175,25 +175,30 @@ class Report
 
     }
 
-    public function update() {
+    public function update()
+    {
         $pdo = dbConnect();
-        $stmt = $pdo->prepare("UPDATE Report SET date = :date, reason = :reason, summary = :summary, visitor_id = :visitor_id, doctor_id = :doctor_id WHERE id = :id");
+    
+        // Delete existing medicaments related to the report
+        $stmt = $pdo->prepare("DELETE FROM Offer WHERE report_id = :report_id");
+        $stmt->bindParam(':report_id', $this->id);
+        $stmt->execute();
+    
+        // Update the report
+        $stmt = $pdo->prepare("UPDATE Report SET date = :date, reason = :reason, summary = :summary, doctor_id = :doctor_id WHERE id = :id");
         $stmt->bindParam(':date', $this->date);
         $stmt->bindParam(':reason', $this->reason);
         $stmt->bindParam(':summary', $this->summary);
-        $stmt->bindParam(':visitor_id', $this->visitor_id);
         $stmt->bindParam(':doctor_id', $this->doctor_id);
         $stmt->bindParam(':id', $this->id);
         $stmt->execute();
-        $stmt->closeCursor();
-
+    
+        // Insert new medicaments related to the report
         foreach ($this->offeredMedicaments as $medicament_id => $quantity) {
-            $stmt = $pdo->prepare("UPDATE Offer SET quantity = :quantity WHERE medicament_id = :medicament_id AND report_id = :report_id");
-        
+            $stmt = $pdo->prepare("INSERT INTO Offer (quantity, medicament_id, report_id) VALUES (:quantity, :medicament_id, :report_id)");
             $stmt->bindParam(':quantity', $quantity);
             $stmt->bindParam(':medicament_id', $medicament_id);
-            $stmt->bindParam(':report_id', $this->id); // Use the ID of the newly inserted report
-        
+            $stmt->bindParam(':report_id', $this->id);
             $stmt->execute();
         }
     }

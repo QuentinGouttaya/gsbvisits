@@ -5,7 +5,7 @@ namespace App\Controllers;
 use App\Models\Report;
 use App\Models\Doctor;
 use App\Models\Medicament;
-use Exception;
+use App\Models\Visitor;
 
 class ReportController
 {
@@ -66,10 +66,11 @@ class ReportController
         }
 
         if (isset($report)) {
+            ob_start();
             require_once 'views/editReport.php';
 
             if ($_SERVER["REQUEST_METHOD"] == "POST") {
-                $id = $_POST["id"];
+                $id = $_GET["id"];
                 $date = $_POST["date"];
                 $doctor_id = $_POST["doctor_id"];
                 $reason = $_POST["reason"];
@@ -79,20 +80,20 @@ class ReportController
                 $visitor_id = $_SESSION["visitor"]->getID(); // Replace this with the actual visitor ID, e.g., $_SESSION["visitor_id"]
 
                 // Retrieve offered medicaments and their quantities
-                $medicament_ids = $_POST["medicament_id"];
-                $quantities = $_POST["quantity"];
-                $offeredMedicaments = [];
-                for ($i = 0; $i < count($medicament_ids); $i++) {
-                    if (isset($medicament_ids[$i]) && isset($quantities[$i])) {
-                        $offeredMedicaments[$medicament_ids[$i]] = $quantities[$i];
+                if (isset($_POST["medicament_id"]) && isset($_POST["quantity"])) {
+
+                    $medicament_ids = $_POST["medicament_id"];
+                    $quantities = $_POST["quantity"];
+                    $offeredMedicaments = [];
+                    for ($i = 0; $i < count($medicament_ids); $i++) {
+                        if (isset($medicament_ids[$i]) && isset($quantities[$i])) {
+                            $offeredMedicaments[$medicament_ids[$i]] = $quantities[$i];
+                        }
                     }
+                    $report->setOfferedMedicament($offeredMedicaments);
+                } else {
+                    $report->setOfferedMedicament([]);
                 }
-
-                // Create a new instance of the Report class with the appropriate arguments
-                $report = new Report($id, $date, $reason, $summary, $visitor_id, $doctor_id);
-
-                // Retrieve the existing report from the database
-                $report = $report->find($id);
 
                 // Update the report with the new data
                 $report->setId($id);
@@ -101,14 +102,13 @@ class ReportController
                 $report->setSummary($summary);
                 $report->setDoctorId($doctor_id);
                 $report->setVisitorId($visitor_id);
-                $report->setOfferedMedicament($offeredMedicaments);
 
                 // Save the updated report to the database
-                $report->save();
-
-                // Redirect the user to a success page or display a success message
-                header("Location: /reports");
+                $report->update();
+                header('Location: /reports');
             }
+        } else {
+            header('Location: /reports');
         }
     }
 

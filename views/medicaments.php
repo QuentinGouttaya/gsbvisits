@@ -21,5 +21,7 @@
         }
         ?>
     </ul>
+
+    <a href="/medicaments/add">Add medicament</a>
 </body>
 </html>
