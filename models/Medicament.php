@@ -131,6 +131,16 @@ class Medicament
             $this->setFamilies($families);
         }
 
+    public static function getAllFamilies() {
+        $pdo = dbConnect();
+        $sql = "SELECT * FROM Family";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute();
+        $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $families = $results;
+        return $families;
+    }
+
     public static function getMedicaments() {
         $pdo = dbConnect();
         $sql = "SELECT * FROM Medicament";
@@ -144,5 +154,31 @@ class Medicament
             $medicaments[] = $medicament;            
         }
         return $medicaments;
+    }
+
+    public function save() {
+        $pdo = dbConnect();
+        $stmt = $pdo->prepare("INSERT INTO Medicament (name, composition, effects, contraindication) VALUES (:name, :composition, :effects, :contraindication)");
+        $stmt->execute([
+            'name' => $this->name,
+            'composition' => $this->composition,
+            'effects' => $this->effects,
+            'contraindication' => $this->contraindication
+        ]);
+        $this->id = $pdo->lastInsertId();
+        $this->saveFamilies();
+    }
+    
+
+    public function saveFamilies() {
+        $pdo = dbConnect();
+        $families = $this->families;
+        $stmt = $pdo->prepare("INSERT INTO Belong (medicament_id, family_id) VALUES (:medicament_id, :family_id)");
+        foreach ($families as $family) {
+            $stmt->execute([
+                'medicament_id' => $this->id,
+                'family_id' => $family
+            ]);
+        }
     }
 }

@@ -122,6 +122,17 @@ switch ($controllerName) {
         if (method_exists($controllerInstance, $actionName)) {
             $controllerInstance->{$actionName}($visitor);
         }
+        break;
+        switch ($actionName) {
+            case 'add':
+                $visitor = isset($_SESSION['visitor']) ? $_SESSION['visitor'] : null;
+                if (method_exists($controllerInstance, $actionName)) {
+                    $controllerInstance->{$actionName}($visitor);
+                } else {
+                    echo "Action {$actionName} not found in {$controllerName}";
+                }
+                break;
+            }
     default:
         if (method_exists($controllerInstance, $actionName)) {
             $controllerInstance->{$actionName}($url);
